@@ -1,0 +1,83 @@
+---
+title: "Mapas en R"
+author: "Joanh"
+date: "2022-12-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+## Análisis, proceso y visualización de datos
+library(tidyverse) # ggplot, dplyr...
+library(magrittr) # %>%
+library(summarytools) # provides functions to summarize numerical and categorical data.
+
+## Librerías específicas
+library(sf) # Simple Features
+library(sp) # Classes and Methods for Spatial Data
+library(leaflet) # LeafletJS interface for R
+library(leaflet.providers) # Third-party tile providers
+library(leaflet.extras) # LeafletJS plugins
+library(rgdal) # R Geospatial' Data Abstraction Library
+library(rnaturalearth) # Interface with Natural Earth map data
+library(rnaturalearthdata) # World Vector Map Data from Natural Earth Used in 'rnaturalearth'
+library(htmltools) # HTML generation and output
+library(htmlwidgets) # Framework for creating HTML widgets
+library(jsonlite) # A fast JSON parser and generator optimized for statistical data and the web
+
+## Otras librerías importantes en análisis geoespacial
+library(raster) # Geographic Data Analysis and Modeling
+library(tmap) # Thematic maps
+library(tmaptools) # Tools for reading and processing spatial data
+library(mapview) # for interactive maps
+library(mapSpain)
+# library(shiny) # for web applications
+```
+
+```{r map1}
+# Uso básico
+mdef <- leaflet() %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  setView(lng = -4.13244, lat = 40.5853, zoom = 12)
+mdef
+```
+
+```{r map2}
+# https://github.com/rOpenSpain/mapSpain
+# Get munics
+Base <- esp_get_munic(year = "2019", region = "Comunidad de Madrid")
+
+# Provs for delimiting
+# provs <- esp_get_prov(prov = "Castilla y Leon")
+
+# Load population data
+data("pobmun19")
+
+# Arrange and create breaks
+
+Base_pop <- merge(Base, pobmun19,
+  by = c("cpro", "cmun"),
+  all.x = TRUE
+)
+
+br <- sort(c(
+  0, 50, 100, 200, 500,
+  1000, 5000, 50000, 100000,
+  Inf
+))
+
+Base_pop$cuts <- cut(Base_pop$pob19, br, dig.lab = 20)
+
+# Plot
+
+ggplot(Base_pop) +
+  geom_sf(aes(fill = cuts), color = NA) +
+  scale_fill_manual(values = hcl.colors(length(br), "cividis")) +
+  labs(
+    title = "Population in Castilla y Leon",
+    subtitle = "INE, 2019",
+    fill = "Persons"
+  ) +
+  theme_void()
+```
+
