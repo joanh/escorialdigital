@@ -2,7 +2,16 @@
 title: "Mapas en R"
 author: "Joanh"
 date: "2022-12-04"
-output: html_document
+output:
+  html_document:
+    theme: cosmo #darkly #spacelab #yeti # lumen # sandstone
+    # css: styles.css
+    self_contained: no
+    toc: yes
+    toc_depth: '3'
+    toc_float: yes
+  #  includes:
+   #   in_header: metaCV.html
 ---
 
 ```{r setup, include=FALSE}
@@ -43,8 +52,10 @@ mdef
 ```
 
 ```{r map2}
+
 # https://github.com/rOpenSpain/mapSpain
-# Get munics
+# Get munics https://rdrr.io/cran/mapSpain/man/esp_get_munic.html
+
 Base <- esp_get_munic(year = "2019", region = "Comunidad de Madrid")
 
 # Provs for delimiting
@@ -74,8 +85,8 @@ ggplot(Base_pop) +
   geom_sf(aes(fill = cuts), color = NA) +
   scale_fill_manual(values = hcl.colors(length(br), "cividis")) +
   labs(
-    title = "Population in Castilla y Leon",
-    subtitle = "INE, 2019",
+    title = "Población en la Comunidad de Madrid",
+    subtitle = "INE - 2019",
     fill = "Persons"
   ) +
   theme_void()
